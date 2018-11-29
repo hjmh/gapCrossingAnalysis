@@ -1,25 +1,40 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle, FancyArrow
 
 ### Plotting functions
-
-def plotClimbingVector(gtdata, ax, gapsize):
-    xa = list(np.squeeze(np.asarray(gtdata[3])))
-    xh = list(np.squeeze(np.asarray(gtdata[4])))
-    ya = list(np.squeeze(np.asarray(gtdata[5])))
-    yh = list(np.squeeze(np.asarray(gtdata[6])))
-
+def plotClimbingVector(gtdata, ax, gapsize, arrowCol):
+    gs = list(np.squeeze(np.asarray(gtdata[8])))
+    
+    if gapsize < 0:
+        mask = np.arange(len(gs))
+    else:
+        mask = np.where(gs == gapsize)[0]
+        
+    #select data of from experiment with correct gap size
+    xa = np.squeeze(np.asarray(gtdata[3]))[mask]
+    xh = np.squeeze(np.asarray(gtdata[4]))[mask]
+    ya = -np.squeeze(np.asarray(gtdata[5]))[mask]
+    yh = -np.squeeze(np.asarray(gtdata[6]))[mask]
+    
     for k in range(len(xa)):
-        arrow = FancyArrow(xa[k], ya[k], xh[k]-xa[k], yh[k]-ya[k], width=0.05, 
-                      color=cols[i], length_includes_head=True, head_width=0.25, alpha=0.6)
+        arrow = FancyArrow(xa[k], ya[k], xh[k]-xa[k], yh[k]-ya[k], width=0.04, 
+                      color=arrowCol, length_includes_head=True, head_width=0.25, alpha=0.7)
         ax.add_patch(arrow)
     
     # add visual indicator for platform
-    rect1 = Rectangle((-6,0), 6, 4, color='grey', alpha=0.4)
-    rect2 = Rectangle((0+gapsize,0), 6, 4, color='grey', alpha=0.4)
-    ax.add_patch(rect1)
-    ax.add_patch(rect2)
+    drawBlock(ax, gapsize)
+
     
+def drawBlock(ax, gapsize):
+    rect1 = Rectangle((-6,-4), 6, 4, color='grey', alpha=0.3)
+    ax.add_patch(rect1)
+
+    if gapsize >0: 
+        rect2 = Rectangle((0+gapsize,-4), 6, 4, color='grey', alpha=0.3)
+        ax.add_patch(rect2)
+
+
 ##Axis beautification
 
 def myAxisTheme(myax):
